@@ -4,21 +4,14 @@ import bodyParser from 'body-parser';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
+import cgofHandler from './sockets-handlers/cgof';
 
 const app: Application = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-io.on('connection', (socket) => {
-  const publisher = setInterval(() => {
-    socket.emit('Hello World!');
-  }, 1000);
-  console.log('A user connected');
-  socket.on('disconnect', () => {
-    console.log('A user disconnected');
-    clearInterval(publisher);
-  });
-});
+const nsp = io.of('/cgof');
+nsp.on('connection', cgofHandler);
 
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.json());
