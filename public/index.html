@@ -7,8 +7,13 @@
     ></script>
   </head>
   <body>
+    <div id="conway"></div>
     <script>
-      const socket = io();
+      const cgofSocket = io('/cgof');
+      cgofSocket.on('updateMap', (socket) => {
+        const conwayDisplay = document.getElementById('conway');
+        conwayDisplay.innerText = JSON.stringify(socket);
+      });
     </script>
   </body>
 </html>
