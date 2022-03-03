@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import Conway from '../libs/Conway';
+import { Conway } from '../libs/Conway';
 
 const conwayGame = new Conway(10);
 
@@ -7,7 +7,7 @@ export default (nop: Socket) => {
   console.log(`User with id of ${nop.id} connected`);
 
   const mapPublisher = setInterval(() => {
-    nop.emit('updateMap', conwayGame.getMap());
+    nop.emit('updateMap', conwayGame.getBoard());
   }, 1000);
 
   nop.on('disconnect', () => {

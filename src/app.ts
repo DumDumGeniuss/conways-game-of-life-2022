@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
-import cgofHandler from './sockets-handlers/cgof';
+import cgofHandler from './socket-handlers/cgof';
 
 const app: Application = express();
 const server = http.createServer(app);
