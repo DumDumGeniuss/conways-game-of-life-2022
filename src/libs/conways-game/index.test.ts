@@ -1,4 +1,4 @@
-import { ConwaysGame } from './conways-game';
+import { ConwaysGame } from '.';
 
 describe('ConwaysGame', () => {
   describe('construction', () => {
@@ -6,8 +6,7 @@ describe('ConwaysGame', () => {
       const c = new ConwaysGame(100);
       const expected = {
         live: false,
-        liveNbrsCount: 0,
-        playerIdsMap: {},
+        color: '#000000',
       };
       expect(c.getCell(99, 99)).toEqual(expected);
     });
@@ -15,16 +14,16 @@ describe('ConwaysGame', () => {
   describe('addPlayer', () => {
     it('Should add player', () => {
       const c = new ConwaysGame(1);
-      const p = { id: '1234', color: '#112233' };
+      const p = { id: '1234', color: '#123456' };
       c.addPlayer(p);
 
-      expect(c.getPlayersMap()[p.id]).toEqual(p);
+      expect(c.getPlayer(p.id)).toEqual(p);
     });
   });
   describe('removePlayer', () => {
     it('Should remove player', () => {
       const c = new ConwaysGame(1);
-      const p = { id: '1234', color: '#112233' };
+      const p = { id: '1234', color: '#123456' };
       c.addPlayer(p);
       c.removePlayer(p.id);
 
@@ -162,6 +161,14 @@ describe('ConwaysGame', () => {
       c.makeCellAlive(0, 0, p.id);
 
       expect(c.getCell(0, 0).live).toBeTruthy();
+    });
+  });
+  describe('averageColor', () => {
+    it('Should output average of colors', () => {
+      const c = new ConwaysGame(1);
+
+      expect(c.averageColor(['#111111', '#222222', '#333333'])).toBe('#222222');
+      expect(c.averageColor(['#aabbcc', '#cccccc', '#dddddd'])).toBe('#c6ccd2');
     });
   });
 });

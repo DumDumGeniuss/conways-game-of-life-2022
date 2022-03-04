@@ -20,7 +20,9 @@ type CleanCell = {
 };
 type Board = Cell[][];
 
-type Player = {
+export type CleanBoard = CleanCell[][];
+
+export type Player = {
   id: string;
   color: string;
 };
@@ -110,12 +112,35 @@ export class ConwaysGame {
     return x < 0 || x >= this.size || y < 0 || y >= this.size;
   }
 
+  averageColor(colors: string[]) {
+    const count = colors.length;
+    let [r, g, b] = [0, 0, 0];
+    colors.forEach((color) => {
+      r += parseInt(color.substring(1, 3), 16);
+      g += parseInt(color.substring(3, 5), 16);
+      b += parseInt(color.substring(5, 7), 16);
+    });
+    const [outR, outG, outB] = [
+      Math.round(r / count).toString(16),
+      Math.round(g / count).toString(16),
+      Math.round(b / count).toString(16),
+    ];
+
+    return `#${outR}${outG}${outB}`;
+  }
+
   private processCell(cell: Cell): CleanCell {
-    // const playerIds = Object.keys(cell.playerIdsMap);
-    // const color = this.playersMap[playerIds[0]].color;
+    let color;
+    const playerIds = Object.keys(cell.playerIdsMap);
+    if (playerIds.length === 0) {
+      color = '#000000';
+    } else {
+      const colors = playerIds.map((id) => this.playersMap[id].color);
+      color = this.averageColor(colors);
+    }
     return {
       live: cell.live,
-      color: '#123456',
+      color,
     };
   }
 
@@ -123,7 +148,7 @@ export class ConwaysGame {
     return this.processCell(this.board[x][y]);
   }
 
-  getBoard(): CleanCell[][] {
+  getBoard(): CleanBoard {
     return this.board.map((cells) =>
       cells.map((cell) => this.processCell(cell))
     );
