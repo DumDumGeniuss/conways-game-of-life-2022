@@ -57,7 +57,7 @@ type LiveNbrsCountMap = {
  */
 type LiveMap = (0 | 1)[][];
 
-export class Conway {
+export class ConwaysGame {
   private playersMap: PlayersMap = {};
   private board: Board = [];
   private size = 0;

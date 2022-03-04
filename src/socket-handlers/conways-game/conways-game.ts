@@ -1,8 +1,8 @@
 import { Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
-import { Conway } from '../libs/Conway';
+import { ConwaysGame } from '../../libs/conways-game/conways-game';
 
-const conwayGame = new Conway(300);
+const conwayGame = new ConwaysGame(300);
 let board: any;
 setInterval(() => {
   board = conwayGame.evolve();
@@ -19,7 +19,7 @@ const validatePlayer = (socket: Socket): Player => {
   return jwt.verify(token, secretKey) as Player;
 };
 
-export const conwayAuthenticator = (socket: Socket, next: any) => {
+export const conwaysGameAuthenticator = (socket: Socket, next: any) => {
   try {
     validatePlayer(socket);
     next();
@@ -28,7 +28,7 @@ export const conwayAuthenticator = (socket: Socket, next: any) => {
   }
 };
 
-export const conwaySocketHandler = (nop: Socket) => {
+export const conwaysGameHandler = (nop: Socket) => {
   const player = validatePlayer(nop);
   conwayGame.addPlayer(player);
   nop.emit(

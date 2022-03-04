@@ -1,9 +1,9 @@
-import { Conway } from './Conway';
+import { ConwaysGame } from './conways-game';
 
-describe('Conway', () => {
+describe('ConwaysGame', () => {
   describe('construction', () => {
     it('Should init board on creation', () => {
-      const c = new Conway(100);
+      const c = new ConwaysGame(100);
       const expected = {
         live: false,
         liveNbrsCount: 0,
@@ -14,7 +14,7 @@ describe('Conway', () => {
   });
   describe('addPlayer', () => {
     it('Should add player', () => {
-      const c = new Conway(1);
+      const c = new ConwaysGame(1);
       const p = { id: '1234', color: '#112233' };
       c.addPlayer(p);
 
@@ -23,7 +23,7 @@ describe('Conway', () => {
   });
   describe('removePlayer', () => {
     it('Should remove player', () => {
-      const c = new Conway(1);
+      const c = new ConwaysGame(1);
       const p = { id: '1234', color: '#112233' };
       c.addPlayer(p);
       c.removePlayer(p.id);
@@ -34,7 +34,7 @@ describe('Conway', () => {
   describe('evolve', () => {
     describe('Revived cell', () => {
       it('Block Pattern', () => {
-        const c = new Conway(3);
+        const c = new ConwaysGame(3);
         const p1 = { id: '1', color: '#112233' };
         const p2 = { id: '2', color: '#112233' };
         const p3 = { id: '3', color: '#112233' };
@@ -50,7 +50,7 @@ describe('Conway', () => {
     });
     describe('Class patterns', () => {
       it('Block Pattern', () => {
-        const c = new Conway(4);
+        const c = new ConwaysGame(4);
         const p = { id: '1234', color: '#112233' };
         c.addPlayer(p);
         c.makeCellAlive(1, 1, p.id);
@@ -69,7 +69,7 @@ describe('Conway', () => {
         expect(secondGeneration).toEqual(blockPattern);
       });
       it('Boat Pattern', () => {
-        const c = new Conway(5);
+        const c = new ConwaysGame(5);
         const p = { id: '1234', color: '#112233' };
         c.addPlayer(p);
         c.makeCellAlive(1, 1, p.id);
@@ -90,7 +90,7 @@ describe('Conway', () => {
         expect(secondGeneration).toEqual(boatPattern);
       });
       it('Blink Pattern', () => {
-        const c = new Conway(5);
+        const c = new ConwaysGame(5);
         const p = { id: '1234', color: '#112233' };
         c.addPlayer(p);
         c.makeCellAlive(1, 2, p.id);
@@ -109,7 +109,7 @@ describe('Conway', () => {
         expect(secondGeneration).toEqual(blinkPattern);
       });
       it('Glider Pattern', () => {
-        const c = new Conway(5);
+        const c = new ConwaysGame(5);
         const p = { id: '1234', color: '#112233' };
         c.addPlayer(p);
         c.makeCellAlive(1, 1, p.id);
@@ -143,20 +143,20 @@ describe('Conway', () => {
   });
   describe('makeCellAlive', () => {
     it('Should not activate cell without player', () => {
-      const c = new Conway(1);
+      const c = new ConwaysGame(1);
       c.makeCellAlive(0, 0, 'Not exists');
 
       expect(c.getCell(0, 0).live).toBeFalsy();
     });
     it('Should not activate cell when position exceeds boarder', () => {
-      const c = new Conway(1);
+      const c = new ConwaysGame(1);
       const p = { id: '1234', color: '#112233' };
       c.makeCellAlive(5, 5, p.id);
 
       expect(c.getCell(0, 0).live).toBeFalsy();
     });
     it('Should activate cell', () => {
-      const c = new Conway(1);
+      const c = new ConwaysGame(1);
       const p = { id: '1234', color: '#112233' };
       c.addPlayer(p);
       c.makeCellAlive(0, 0, p.id);

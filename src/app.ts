@@ -5,9 +5,9 @@ import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
 import {
-  conwayAuthenticator,
-  conwaySocketHandler,
-} from './socket-handlers/conway';
+  conwaysGameAuthenticator,
+  conwaysGameHandler,
+} from './socket-handlers/conways-game/conways-game';
 
 const app: Application = express();
 const server = http.createServer(app);
@@ -17,9 +17,9 @@ const io = new Server(server, {
   },
 });
 
-const nsp = io.of('/conway');
-nsp.use(conwayAuthenticator);
-nsp.on('connection', conwaySocketHandler);
+const nsp = io.of('/conways-game');
+nsp.use(conwaysGameAuthenticator);
+nsp.on('connection', conwaysGameHandler);
 
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.json());
