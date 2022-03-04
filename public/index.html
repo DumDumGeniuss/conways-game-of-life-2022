@@ -9,11 +9,40 @@
   <body>
     <div id="conway"></div>
     <script>
-      const cgofSocket = io('/cgof');
-      cgofSocket.on('updateMap', (socket) => {
-        const conwayDisplay = document.getElementById('conway');
-        conwayDisplay.innerText = JSON.stringify(socket);
+      const conwaySocket = io('ws://localhost:8000/conway', {
+        auth: {
+          authorization: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA3OTgzNTQ3MDA0MSIsImNvbG9yIjoiIzEyMzQ1NiIsImlhdCI6MTY0NjM4NDg3N30.fCWHQbtXDMssgkuu4J1ZwW-DbyXPbFr9WqYfgz-Aerk`,
+        },
       });
+      let player;
+      let players;
+      let board;
+
+      conwaySocket.on('start', (player, players, board) => {
+        player = player;
+        players = players;
+        board = board;
+        console.log(player, players, board);
+
+        conwaySocket.emit('revive_cell', 1, 1, player.id);
+      });
+
+      conwaySocket.on('update_board', (board) => {
+        console.log(board);
+      });
+
+      conwaySocket.on('connect_error', (err) => {
+        console.log('Ouch');
+      });
+
+      conwaySocket.on('unauthenticated', (err) => {
+        console.log('Ouch');
+        conwaySocket.disconnect();
+      });
+      // conwaySocket.on('updateMap', (socket) => {
+      //   const conwayDisplay = document.getElementById('conway');
+      //   conwayDisplay.innerText = JSON.stringify(socket);
+      // });
     </script>
   </body>
 </html>

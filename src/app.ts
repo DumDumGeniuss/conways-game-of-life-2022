@@ -4,14 +4,22 @@ import bodyParser from 'body-parser';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
-import cgofHandler from './socket-handlers/cgof';
+import {
+  conwayAuthenticator,
+  conwaySocketHandler,
+} from './socket-handlers/conway';
 
 const app: Application = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+  },
+});
 
-const nsp = io.of('/cgof');
-nsp.on('connection', cgofHandler);
+const nsp = io.of('/conway');
+nsp.use(conwayAuthenticator);
+nsp.on('connection', conwaySocketHandler);
 
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.json());

@@ -1,3 +1,7 @@
+type PlayerIdsMap = {
+  [id: string]: true;
+};
+
 /**
  * Cell
  * @property {boolean} live Whether it's live or not.
@@ -7,15 +11,17 @@
 type Cell = {
   live: boolean;
   liveNbrsCount: number;
-  playerIdsMap: {
-    [id: string]: true;
-  };
+  playerIdsMap: PlayerIdsMap;
+};
+
+type CleanCell = {
+  live: boolean;
+  color: string;
 };
 type Board = Cell[][];
 
 type Player = {
   id: string;
-  ip: string;
   color: string;
 };
 
@@ -104,12 +110,23 @@ export class Conway {
     return x < 0 || x >= this.size || y < 0 || y >= this.size;
   }
 
-  getCell(x: number, y: number): Cell {
-    return this.board[x][y];
+  private processCell(cell: Cell): CleanCell {
+    // const playerIds = Object.keys(cell.playerIdsMap);
+    // const color = this.playersMap[playerIds[0]].color;
+    return {
+      live: cell.live,
+      color: '#123456',
+    };
   }
 
-  getBoard(): Board {
-    return this.board;
+  getCell(x: number, y: number): CleanCell {
+    return this.processCell(this.board[x][y]);
+  }
+
+  getBoard(): CleanCell[][] {
+    return this.board.map((cells) =>
+      cells.map((cell) => this.processCell(cell))
+    );
   }
 
   getLiveMap(): LiveMap {
@@ -135,6 +152,8 @@ export class Conway {
 
     positionOfRevivingCells.forEach(([x, y]) => this.reviveCell(x, y));
     positionOfDyingCells.forEach(([x, y]) => this.killCell(x, y));
+
+    return this.getBoard();
   }
 
   addPlayer(player: Player) {
@@ -275,7 +294,7 @@ export class Conway {
     this.addNbrsLiveNbrsCount(x, y);
   }
 
-  makeCellAlive(x: number, y: number, playerId: string) {
+  makeCellAlive(x: number, y: number, playerId: string): CleanCell | void {
     if (this.isOutsideBorder(x, y)) {
       return;
     }
@@ -296,6 +315,7 @@ export class Conway {
       newCount: this.board[x][y].liveNbrsCount,
     });
     this.addNbrsLiveNbrsCount(x, y);
+    return this.processCell(this.board[x][y]);
   }
 }
 
