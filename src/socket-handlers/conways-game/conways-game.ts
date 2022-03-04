@@ -12,7 +12,7 @@ type User = {
 
 const getUser = (socket: Socket): User => {
   const token = socket.handshake.auth.authorization;
-  const secretKey = process.env.SECRET_KEY || '';
+  const secretKey = process.env.SECRET_KEY || 'hello_world';
   return jwt.verify(token, secretKey) as User;
 };
 
