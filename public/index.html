@@ -22,27 +22,17 @@
         player = player;
         players = players;
         board = board;
-        console.log(player, players, board);
 
         conwaySocket.emit('revive_cell', 1, 1, player.id);
       });
 
-      conwaySocket.on('update_board', (board) => {
-        console.log(board);
-      });
+      conwaySocket.on('update_board', (board) => {});
 
-      conwaySocket.on('connect_error', (err) => {
-        console.log('Ouch');
-      });
+      conwaySocket.on('connect_error', (err) => {});
 
       conwaySocket.on('unauthenticated', (err) => {
-        console.log('Ouch');
         conwaySocket.disconnect();
       });
-      // conwaySocket.on('updateMap', (socket) => {
-      //   const conwayDisplay = document.getElementById('conway');
-      //   conwayDisplay.innerText = JSON.stringify(socket);
-      // });
     </script>
   </body>
 </html>

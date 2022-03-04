@@ -11,11 +11,11 @@ export class ConwaysGameManager {
     [playerId: string]: Function;
   } = {};
 
-  constructor(g: ConwaysGame) {
+  constructor(g: ConwaysGame, duration: number) {
     this.game = g;
     this.evolver = setInterval(() => {
       this.evolveConwaysGame();
-    }, 1000);
+    }, duration);
   }
 
   getGame(): ConwaysGame {
@@ -23,6 +23,7 @@ export class ConwaysGameManager {
   }
 
   subscribe(player: Player, callback: Function) {
+    delete this.observers[player.id];
     this.observers[player.id] = callback;
   }
 

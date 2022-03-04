@@ -316,6 +316,14 @@ export class ConwaysGame {
         ...cell.playerIdsMap,
       };
     });
+    this.updateLiveNbrsCountMap({
+      x,
+      y,
+      live: false,
+      newLive: true,
+      count: this.board[x][y].liveNbrsCount,
+      newCount: this.board[x][y].liveNbrsCount,
+    });
     this.addNbrsLiveNbrsCount(x, y);
   }
 

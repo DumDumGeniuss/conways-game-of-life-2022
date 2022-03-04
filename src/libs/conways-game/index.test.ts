@@ -96,6 +96,8 @@ describe('ConwaysGame', () => {
         c.makeCellAlive(2, 2, p.id);
         c.makeCellAlive(3, 2, p.id);
         c.evolve();
+        c.evolve();
+        c.evolve();
         const secondGeneration = c.getLiveMap();
         const blinkPattern = [
           [0, 0, 0, 0, 0],
