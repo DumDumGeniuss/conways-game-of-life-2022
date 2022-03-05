@@ -66,10 +66,7 @@ const handleReviveCellEvent = (
   playerId: string
 ) => {
   nop.on('revive_cell', (x: number, y: number) => {
-    const cell = conwaysGame.reviveCell(x, y, playerId);
-    if (!cell) {
-      nop.emit('revive_cell_failed', x, y, conwaysGame.getCell(x, y));
-    }
+    conwaysGame.reviveCell(x, y, playerId);
   });
 };
 

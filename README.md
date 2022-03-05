@@ -16,6 +16,8 @@ We have two classes **ConwaysGame** and **ConwaysGameManager** and one **conways
 
 ### ConwaysGame Class
 
+Check this for [more details](./src/libs/conways-game/README.md).
+
 A class that takes manages a Conways Game ecosystem, it does the following things:
 
 1. Initialize a Conways game with given size. By default, all cells are dead cells.
@@ -28,6 +30,8 @@ A class that takes manages a Conways Game ecosystem, it does the following thing
 
 ### ConwaysGameManager Class
 
+Check this for [more details](./src/libs/conways-game-manager/README.md).
+
 A class the consumes a ConwaysGame instance and manage do the following things:
 
 1. Provide ConwaysGame instace to a new player in a new socket session.
@@ -37,6 +41,8 @@ A class the consumes a ConwaysGame instance and manage do the following things:
 3. Subscribe players to the evolution of a ConwaysGame instance, so our clients can receive the event at nearly same time (though latency of internet is inevitable), to better synchronize the game processes of all clients.
 
 ### Conways Game Socket Handlers
+
+Check this for [more details](./src/socket-handlers/conways-game/README.md).
 
 This handler is in charge of manaing an entire socket seesion, it does:
 
