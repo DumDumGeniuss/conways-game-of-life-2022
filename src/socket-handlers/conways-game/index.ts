@@ -6,6 +6,17 @@ import { generateHash, generateHexColor } from '../../utils/common/';
 
 const conwaysGameManager = new ConwaysGameManager(new ConwaysGame(30), 2000);
 
+enum SocketEventName {
+  Logged = 'logged',
+  GameStarted = 'game_started',
+  PlayerJoined = 'player_joined',
+  PlayerLeft = 'player_left',
+  CellRevived = 'cell_revived',
+  BoardUpdated = 'board_updated',
+  ReviveCell = 'revive_cell',
+  Disconnect = 'disconnect',
+}
+
 export const conwaysGameAuthenticator = (socket: Socket, next: any) => {
   try {
     socket.data.user = validateToken(socket.handshake.auth.authorization);
@@ -23,7 +34,7 @@ export const conwaysGameAuthenticator = (socket: Socket, next: any) => {
 };
 
 const emitLoggedEvent = (nop: Socket, user: User, token: string) => {
-  nop.emit('logged', user, token);
+  nop.emit(SocketEventName.Logged, user, token);
 };
 
 const emitGameStartedEvent = (
@@ -32,7 +43,7 @@ const emitGameStartedEvent = (
   playerId: string
 ) => {
   nop.emit(
-    'game_started',
+    SocketEventName.GameStarted,
     conwaysGame.getSize(),
     conwaysGame.getPlayer(playerId),
     conwaysGame.getPlayers(),
@@ -45,11 +56,14 @@ const emitPlayerJoinedEvent = (
   conwaysGame: ConwaysGame,
   playerId: string
 ) => {
-  nop.broadcast.emit('player_joined', conwaysGame.getPlayer(playerId));
+  nop.broadcast.emit(
+    SocketEventName.PlayerJoined,
+    conwaysGame.getPlayer(playerId)
+  );
 };
 
 const emitPlayerLeftEvent = (nop: Socket, playerId: string) => {
-  nop.broadcast.emit('player_left', playerId);
+  nop.broadcast.emit(SocketEventName.PlayerLeft, playerId);
 };
 
 const emitCellRevivedEvent = (
@@ -58,7 +72,7 @@ const emitCellRevivedEvent = (
   y: number,
   playerId: string
 ) => {
-  nop.broadcast.emit('cell_revived', x, y, playerId);
+  nop.broadcast.emit(SocketEventName.CellRevived, x, y, playerId);
 };
 
 const subscribePlayerForBoardUpdatedEvent = (
@@ -69,7 +83,7 @@ const subscribePlayerForBoardUpdatedEvent = (
   conwaysGameManager.subscribe(
     conwaysGame.getPlayer(playerId),
     (board: CleanBoard) => {
-      nop.emit('board_updated', board);
+      nop.emit(SocketEventName.BoardUpdated, board);
     }
   );
 };
@@ -79,7 +93,7 @@ const handleReviveCellEvent = (
   conwaysGame: ConwaysGame,
   playerId: string
 ) => {
-  nop.on('revive_cell', (x: number, y: number) => {
+  nop.on(SocketEventName.ReviveCell, (x: number, y: number) => {
     conwaysGame.reviveCell(x, y, playerId);
 
     emitCellRevivedEvent(nop, x, y, playerId);
@@ -92,7 +106,7 @@ const handleDisconnectEvent = (
   playerId: string
 ) => {
   // The player disconnects
-  nop.on('disconnect', (reason) => {
+  nop.on(SocketEventName.Disconnect, (reason) => {
     console.log(
       `Player with id of ${playerId} disconnected. Readon: ${reason}.`
     );
