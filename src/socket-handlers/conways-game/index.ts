@@ -39,12 +39,26 @@ const emitGameStartedEvent = (
     conwaysGame.getBoard()
   );
 };
+
 const emitPlayerJoinedEvent = (
   nop: Socket,
   conwaysGame: ConwaysGame,
   playerId: string
 ) => {
-  nop.broadcast.emit('player_joind', conwaysGame.getPlayer(playerId));
+  nop.broadcast.emit('player_joined', conwaysGame.getPlayer(playerId));
+};
+
+const emitPlayerLeftEvent = (nop: Socket, playerId: string) => {
+  nop.broadcast.emit('player_left', playerId);
+};
+
+const emitCellRevivedEvent = (
+  nop: Socket,
+  x: number,
+  y: number,
+  playerId: string
+) => {
+  nop.broadcast.emit('cell_revived', x, y, playerId);
 };
 
 const subscribePlayerForBoardUpdatedEvent = (
@@ -67,6 +81,8 @@ const handleReviveCellEvent = (
 ) => {
   nop.on('revive_cell', (x: number, y: number) => {
     conwaysGame.reviveCell(x, y, playerId);
+
+    emitCellRevivedEvent(nop, x, y, playerId);
   });
 };
 
@@ -81,6 +97,7 @@ const handleDisconnectEvent = (
       `Player with id of ${playerId} disconnected. Readon: ${reason}.`
     );
     conwaysGame.removePlayer(playerId);
+    emitPlayerLeftEvent(nop, playerId);
     conwaysGameManager.unsubscribe(playerId);
   });
 };
