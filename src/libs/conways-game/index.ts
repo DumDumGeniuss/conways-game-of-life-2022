@@ -11,7 +11,7 @@ type PlayerIdsMap = {
 type Cell = {
   live: boolean;
   liveNbrsCount: number;
-  playerIdsMap: PlayerIdsMap;
+  color: string;
 };
 
 type CleanCell = {
@@ -101,7 +101,7 @@ export class ConwaysGame {
         this.board[i].push({
           live: false,
           liveNbrsCount: 0,
-          playerIdsMap: {},
+          color: '#000000',
         });
         this.liveNbrsCountMap.dead[0][`${i},${j}`] = [i, j];
       }
@@ -130,17 +130,9 @@ export class ConwaysGame {
   }
 
   private processCell(cell: Cell): CleanCell {
-    let color;
-    const playerIds = Object.keys(cell.playerIdsMap);
-    if (playerIds.length === 0) {
-      color = '#000000';
-    } else {
-      const colors = playerIds.map((id) => this.playersMap[id].color);
-      color = this.averageColor(colors);
-    }
     return {
       live: cell.live,
-      color,
+      color: cell.color,
     };
   }
 
@@ -295,7 +287,7 @@ export class ConwaysGame {
       return;
     }
     this.board[x][y].live = false;
-    this.board[x][y].playerIdsMap = {};
+    this.board[x][y].color = '#000000';
     this.updateLiveNbrsCountMap({
       x,
       y,
@@ -314,12 +306,7 @@ export class ConwaysGame {
     const deadCell = this.board[x][y];
     const liveNbs = this.getLiveNbs(x, y);
     deadCell.live = true;
-    liveNbs.forEach((cell) => {
-      deadCell.playerIdsMap = {
-        ...deadCell.playerIdsMap,
-        ...cell.playerIdsMap,
-      };
-    });
+    deadCell.color = this.averageColor(liveNbs.map((liveNbr) => liveNbr.color));
     this.updateLiveNbrsCountMap({
       x,
       y,
@@ -342,7 +329,7 @@ export class ConwaysGame {
       return;
     }
     this.board[x][y].live = true;
-    this.board[x][y].playerIdsMap[playerId] = true;
+    this.board[x][y].color = this.playersMap[playerId].color;
     this.updateLiveNbrsCountMap({
       x,
       y,
