@@ -1,29 +1,29 @@
 import { Socket } from 'socket.io';
-import jwt from 'jsonwebtoken';
 import { ConwaysGame, CleanBoard } from '../../libs/conways-game';
 import { ConwaysGameManager } from '../../libs/conways-game-manager';
+import { validateToken, generateToken, User } from '../../utils/authenticate/';
+import { generateHash, generateHexColor } from '../../utils/common/';
 
 const conwaysGameManager = new ConwaysGameManager(new ConwaysGame(30), 2000);
 
-type Player = {
-  id: string;
-  color: string;
-};
-
-const getUser = (socket: Socket): Player => {
-  const token = socket.handshake.auth.authorization;
-  const secretKey = process.env.SECRET_KEY || 'hello_world';
-  return jwt.verify(token, secretKey) as Player;
-};
-
 export const conwaysGameAuthenticator = (socket: Socket, next: any) => {
   try {
-    socket.data.user = getUser(socket);
+    socket.data.user = validateToken(socket.handshake.auth.authorization);
+    socket.data.token = socket.handshake.auth.authorization;
     next();
   } catch (e: any) {
-    console.error(e);
-    next(e);
+    const newUser = {
+      id: generateHash(),
+      color: generateHexColor(),
+    };
+    socket.data.user = newUser;
+    socket.data.token = generateToken(newUser);
+    next();
   }
+};
+
+const emitLoggedEvent = (nop: Socket, user: User, token: string) => {
+  nop.emit('logged', user, token);
 };
 
 const emitGameStartedEvent = (
@@ -90,12 +90,13 @@ const handleDisconnectEvent = (
 
 export const conwaysGameHandler = (nop: Socket) => {
   // Get the user data
-  const player: Player = nop.data.user;
-  console.log(`Player with oid of ${player} connected.`);
+  const player: User = nop.data.user;
+  console.log(`Player with oid of ${player.id} connected.`);
 
   // Get the conways game object and add new player!
   const conwaysGame = conwaysGameManager.getGame();
   conwaysGame.addPlayer(player);
+  emitLoggedEvent(nop, nop.data.user, nop.data.token);
 
   // Tell client that we're started
   emitGameStartedEvent(nop, conwaysGame, player.id);

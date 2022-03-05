@@ -18,7 +18,7 @@ describe('socket-handlers/conways-game', () => {
       expect(nextMockup.mock.calls.length).toBe(1);
       expect(socket.data.user.id).toBe('079835470041');
     });
-    it('Should throw excpetion when token is not valid', () => {
+    it('Should generate new user', () => {
       const nextMockup = jest.fn();
       const socket: any = {
         data: {},
@@ -29,7 +29,7 @@ describe('socket-handlers/conways-game', () => {
         },
       };
       conwaysGameAuthenticator(socket, nextMockup);
-      expect(nextMockup.mock.calls[0][0].name).toBe('JsonWebTokenError');
+      expect(socket.data.user).not.toBeUndefined();
     });
   });
 });
