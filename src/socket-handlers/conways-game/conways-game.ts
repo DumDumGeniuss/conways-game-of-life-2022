@@ -21,6 +21,7 @@ export const conwaysGameAuthenticator = (socket: Socket, next: any) => {
     socket.data.user = getUser(socket);
     next();
   } catch (e: any) {
+    console.error(e);
     next(e);
   }
 };
@@ -28,6 +29,8 @@ export const conwaysGameAuthenticator = (socket: Socket, next: any) => {
 export const conwaysGameHandler = (nop: Socket) => {
   // Get the user data
   const player: User = nop.data.user;
+
+  console.log(`Player with oid of ${player} connected.`);
 
   // Get the conways game object and add new player!
   const conwaysGame = conwaysGameManager.getGame();
@@ -59,7 +62,10 @@ export const conwaysGameHandler = (nop: Socket) => {
   });
 
   // The player disconnects
-  nop.on('disconnect', () => {
+  nop.on('disconnect', (reason) => {
+    console.log(
+      `Player with id of ${player.id} disconnected. Readon: ${reason}.`
+    );
     conwaysGameManager.unsubscribe(player.id);
   });
 };
