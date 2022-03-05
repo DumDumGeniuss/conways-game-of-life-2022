@@ -144,6 +144,10 @@ export class ConwaysGame {
     };
   }
 
+  getSize(): number {
+    return this.size;
+  }
+
   getCell(x: number, y: number): CleanCell {
     return this.processCell(this.board[x][y]);
   }
@@ -185,8 +189,8 @@ export class ConwaysGame {
     this.playersMap[player.id] = player;
   }
 
-  getPlayersMap(): PlayersMap {
-    return this.playersMap;
+  getPlayers(): Player[] {
+    return Object.keys(this.playersMap).map((key) => this.playersMap[key]);
   }
 
   getPlayer(id: string): Player {

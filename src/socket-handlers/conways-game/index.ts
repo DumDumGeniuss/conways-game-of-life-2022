@@ -3,17 +3,17 @@ import jwt from 'jsonwebtoken';
 import { ConwaysGame, CleanBoard } from '../../libs/conways-game';
 import { ConwaysGameManager } from '../../libs/conways-game-manager';
 
-const conwaysGameManager = new ConwaysGameManager(new ConwaysGame(10), 2000);
+const conwaysGameManager = new ConwaysGameManager(new ConwaysGame(30), 2000);
 
-type User = {
+type Player = {
   id: string;
   color: string;
 };
 
-const getUser = (socket: Socket): User => {
+const getUser = (socket: Socket): Player => {
   const token = socket.handshake.auth.authorization;
   const secretKey = process.env.SECRET_KEY || 'hello_world';
-  return jwt.verify(token, secretKey) as User;
+  return jwt.verify(token, secretKey) as Player;
 };
 
 export const conwaysGameAuthenticator = (socket: Socket, next: any) => {
@@ -26,9 +26,71 @@ export const conwaysGameAuthenticator = (socket: Socket, next: any) => {
   }
 };
 
+const emitGameStartedEvent = (
+  nop: Socket,
+  conwaysGame: ConwaysGame,
+  playerId: string
+) => {
+  nop.emit(
+    'game_started',
+    conwaysGame.getSize(),
+    conwaysGame.getPlayer(playerId),
+    conwaysGame.getPlayers(),
+    conwaysGame.getBoard()
+  );
+};
+const emitPlayerJoinedEvent = (
+  nop: Socket,
+  conwaysGame: ConwaysGame,
+  playerId: string
+) => {
+  nop.broadcast.emit('player_joind', conwaysGame.getPlayer(playerId));
+};
+
+const subscribePlayerForBoardUpdatedEvent = (
+  nop: Socket,
+  conwaysGame: ConwaysGame,
+  playerId: string
+) => {
+  conwaysGameManager.subscribe(
+    conwaysGame.getPlayer(playerId),
+    (board: CleanBoard) => {
+      nop.emit('board_updated', board);
+    }
+  );
+};
+
+const handleReviveCellEvent = (
+  nop: Socket,
+  conwaysGame: ConwaysGame,
+  playerId: string
+) => {
+  nop.on('revive_cell', (x: number, y: number) => {
+    const cell = conwaysGame.reviveCell(x, y, playerId);
+    if (!cell) {
+      nop.emit('revive_cell_failed', x, y, conwaysGame.getCell(x, y));
+    }
+  });
+};
+
+const handleDisconnectEvent = (
+  nop: Socket,
+  conwaysGame: ConwaysGame,
+  playerId: string
+) => {
+  // The player disconnects
+  nop.on('disconnect', (reason) => {
+    console.log(
+      `Player with id of ${playerId} disconnected. Readon: ${reason}.`
+    );
+    conwaysGame.removePlayer(playerId);
+    conwaysGameManager.unsubscribe(playerId);
+  });
+};
+
 export const conwaysGameHandler = (nop: Socket) => {
   // Get the user data
-  const player: User = nop.data.user;
+  const player: Player = nop.data.user;
   console.log(`Player with oid of ${player} connected.`);
 
   // Get the conways game object and add new player!
@@ -36,38 +98,15 @@ export const conwaysGameHandler = (nop: Socket) => {
   conwaysGame.addPlayer(player);
 
   // Tell client that we're started
-  nop.emit(
-    'game_started',
-    conwaysGame.getPlayer(player.id),
-    conwaysGame.getBoard()
-  );
-
-  // Tell other players we joined
-  nop.broadcast.emit('player_joind', conwaysGame.getPlayer(player.id));
+  emitGameStartedEvent(nop, conwaysGame, player.id);
+  emitPlayerJoinedEvent(nop, conwaysGame, player.id);
 
   // Subscribe borad chagnes after evolving
-  conwaysGameManager.subscribe(player, (board: CleanBoard) => {
-    nop.emit('board_updated', board);
-  });
+  subscribePlayerForBoardUpdatedEvent(nop, conwaysGame, player.id);
 
-  // The player requests to revive a cell
-  nop.on('revive_cell', (x: number, y: number, playerId: string) => {
-    const cell = conwaysGame.reviveCell(x, y, playerId);
-    if (!cell) {
-      return;
-    }
-    nop.emit('cell_revived', x, y, cell);
-    nop.broadcast.emit('cell_revived', x, y, cell);
-  });
-
-  // The player disconnects
-  nop.on('disconnect', (reason) => {
-    console.log(
-      `Player with id of ${player.id} disconnected. Readon: ${reason}.`
-    );
-    conwaysGame.removePlayer(player.id);
-    conwaysGameManager.unsubscribe(player.id);
-  });
+  // Handle events from client
+  handleReviveCellEvent(nop, conwaysGame, player.id);
+  handleDisconnectEvent(nop, conwaysGame, player.id);
 };
 
 export {};
