@@ -52,6 +52,33 @@ This handler is in charge of manaing an entire socket seesion, it does:
 
 3. Trigger events to clients whenever the game board is updated of when a new user joined.
 
+## Deployment Guide
+
+### Env Variables
+
+| Env Variable Name | Description                                                                                         | Required |
+| ----------------- | --------------------------------------------------------------------------------------------------- | -------- |
+| CLIENT_URL        | The client url, set this one correctly, otherwise we will have CORS issue, e.g: https://example.com | Yes      |
+| SECRET_KEY        | The key we use to generate and validate auth tokens.                                                | Yes      |
+
+### Start the server
+
+```bash
+yarn
+yarn build
+yarn start
+```
+
+### Deploy on Heroku
+
+Already setup, you can deploy to Heroku by following this [guide](https://devcenter.heroku.com/articles/git).
+
+```bash
+heroku git:remote -a your-heroku-app-name
+heroku config:set CLIENT_URL=https://example.com SECRET_KEY="hello_world"
+git push heroku main
+```
+
 ## Development
 
 ### Install packages
