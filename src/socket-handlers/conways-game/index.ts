@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { ConwaysGame, CleanBoard } from '../../libs/conways-game';
 import { ConwaysGameManager } from '../../libs/conways-game-manager';
 
-const conwaysGameManager = new ConwaysGameManager(new ConwaysGame(10), 1000);
+const conwaysGameManager = new ConwaysGameManager(new ConwaysGame(10), 2000);
 
 type User = {
   id: string;
@@ -29,7 +29,6 @@ export const conwaysGameAuthenticator = (socket: Socket, next: any) => {
 export const conwaysGameHandler = (nop: Socket) => {
   // Get the user data
   const player: User = nop.data.user;
-
   console.log(`Player with oid of ${player} connected.`);
 
   // Get the conways game object and add new player!
@@ -53,7 +52,7 @@ export const conwaysGameHandler = (nop: Socket) => {
 
   // The player requests to revive a cell
   nop.on('revive_cell', (x: number, y: number, playerId: string) => {
-    const cell = conwaysGame.makeCellAlive(x, y, playerId);
+    const cell = conwaysGame.reviveCell(x, y, playerId);
     if (!cell) {
       return;
     }
@@ -66,6 +65,7 @@ export const conwaysGameHandler = (nop: Socket) => {
     console.log(
       `Player with id of ${player.id} disconnected. Readon: ${reason}.`
     );
+    conwaysGame.removePlayer(player.id);
     conwaysGameManager.unsubscribe(player.id);
   });
 };

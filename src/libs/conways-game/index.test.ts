@@ -40,9 +40,9 @@ describe('ConwaysGame', () => {
         c.addPlayer(p1);
         c.addPlayer(p2);
         c.addPlayer(p3);
-        c.makeCellAlive(0, 0, p1.id);
-        c.makeCellAlive(0, 1, p2.id);
-        c.makeCellAlive(0, 2, p3.id);
+        c.reviveCell(0, 0, p1.id);
+        c.reviveCell(0, 1, p2.id);
+        c.reviveCell(0, 2, p3.id);
         c.evolve();
         expect(c.getCell(1, 1).color).toEqual('#112233');
       });
@@ -52,10 +52,10 @@ describe('ConwaysGame', () => {
         const c = new ConwaysGame(4);
         const p = { id: '1234', color: '#112233' };
         c.addPlayer(p);
-        c.makeCellAlive(1, 1, p.id);
-        c.makeCellAlive(1, 2, p.id);
-        c.makeCellAlive(2, 1, p.id);
-        c.makeCellAlive(2, 2, p.id);
+        c.reviveCell(1, 1, p.id);
+        c.reviveCell(1, 2, p.id);
+        c.reviveCell(2, 1, p.id);
+        c.reviveCell(2, 2, p.id);
         c.evolve();
         const secondGeneration = c.getLiveMap();
         const blockPattern = [
@@ -71,11 +71,11 @@ describe('ConwaysGame', () => {
         const c = new ConwaysGame(5);
         const p = { id: '1234', color: '#112233' };
         c.addPlayer(p);
-        c.makeCellAlive(1, 1, p.id);
-        c.makeCellAlive(1, 2, p.id);
-        c.makeCellAlive(2, 1, p.id);
-        c.makeCellAlive(2, 3, p.id);
-        c.makeCellAlive(3, 2, p.id);
+        c.reviveCell(1, 1, p.id);
+        c.reviveCell(1, 2, p.id);
+        c.reviveCell(2, 1, p.id);
+        c.reviveCell(2, 3, p.id);
+        c.reviveCell(3, 2, p.id);
         c.evolve();
         const secondGeneration = c.getLiveMap();
         const boatPattern = [
@@ -92,9 +92,9 @@ describe('ConwaysGame', () => {
         const c = new ConwaysGame(5);
         const p = { id: '1234', color: '#112233' };
         c.addPlayer(p);
-        c.makeCellAlive(1, 2, p.id);
-        c.makeCellAlive(2, 2, p.id);
-        c.makeCellAlive(3, 2, p.id);
+        c.reviveCell(1, 2, p.id);
+        c.reviveCell(2, 2, p.id);
+        c.reviveCell(3, 2, p.id);
         c.evolve();
         c.evolve();
         c.evolve();
@@ -113,11 +113,11 @@ describe('ConwaysGame', () => {
         const c = new ConwaysGame(5);
         const p = { id: '1234', color: '#112233' };
         c.addPlayer(p);
-        c.makeCellAlive(1, 1, p.id);
-        c.makeCellAlive(2, 2, p.id);
-        c.makeCellAlive(2, 3, p.id);
-        c.makeCellAlive(3, 1, p.id);
-        c.makeCellAlive(3, 2, p.id);
+        c.reviveCell(1, 1, p.id);
+        c.reviveCell(2, 2, p.id);
+        c.reviveCell(2, 3, p.id);
+        c.reviveCell(3, 1, p.id);
+        c.reviveCell(3, 2, p.id);
         c.evolve();
         const secondGeneration = c.getLiveMap();
         c.evolve();
@@ -142,17 +142,17 @@ describe('ConwaysGame', () => {
       });
     });
   });
-  describe('makeCellAlive', () => {
+  describe('reviveCell', () => {
     it('Should not activate cell without player', () => {
       const c = new ConwaysGame(1);
-      c.makeCellAlive(0, 0, 'Not exists');
+      c.reviveCell(0, 0, 'Not exists');
 
       expect(c.getCell(0, 0).live).toBeFalsy();
     });
     it('Should not activate cell when position exceeds boarder', () => {
       const c = new ConwaysGame(1);
       const p = { id: '1234', color: '#112233' };
-      c.makeCellAlive(5, 5, p.id);
+      c.reviveCell(5, 5, p.id);
 
       expect(c.getCell(0, 0).live).toBeFalsy();
     });
@@ -160,7 +160,7 @@ describe('ConwaysGame', () => {
       const c = new ConwaysGame(1);
       const p = { id: '1234', color: '#112233' };
       c.addPlayer(p);
-      c.makeCellAlive(0, 0, p.id);
+      c.reviveCell(0, 0, p.id);
 
       expect(c.getCell(0, 0).live).toBeTruthy();
     });

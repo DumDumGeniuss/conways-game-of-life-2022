@@ -7,7 +7,7 @@ import path from 'path';
 import {
   conwaysGameAuthenticator,
   conwaysGameHandler,
-} from './socket-handlers/conways-game/conways-game';
+} from './socket-handlers/conways-game/';
 
 const app: Application = express();
 const server = http.createServer(app);

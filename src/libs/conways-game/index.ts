@@ -175,7 +175,7 @@ export class ConwaysGame {
         .forEach(([x, y]) => positionOfDyingCells.push([x, y]));
     }
 
-    positionOfRevivingCells.forEach(([x, y]) => this.reviveCell(x, y));
+    positionOfRevivingCells.forEach(([x, y]) => this.giveBirthToCell(x, y));
     positionOfDyingCells.forEach(([x, y]) => this.killCell(x, y));
 
     return this.getBoard();
@@ -303,7 +303,7 @@ export class ConwaysGame {
     this.decreaseNbrsLiveNbrsCount(x, y);
   }
 
-  private reviveCell(x: number, y: number) {
+  private giveBirthToCell(x: number, y: number) {
     if (this.isOutsideBorder(x, y)) {
       return;
     }
@@ -327,7 +327,7 @@ export class ConwaysGame {
     this.addNbrsLiveNbrsCount(x, y);
   }
 
-  makeCellAlive(x: number, y: number, playerId: string): CleanCell | void {
+  reviveCell(x: number, y: number, playerId: string): CleanCell | void {
     if (this.isOutsideBorder(x, y)) {
       return;
     }
