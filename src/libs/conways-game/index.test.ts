@@ -31,21 +31,19 @@ describe('ConwaysGame', () => {
     });
   });
   describe('evolve', () => {
-    describe('Revived cell', () => {
-      it('Block Pattern', () => {
-        const c = new ConwaysGame(3);
-        const p1 = { id: '1', color: '#112233' };
-        const p2 = { id: '2', color: '#112233' };
-        const p3 = { id: '3', color: '#112233' };
-        c.addPlayer(p1);
-        c.addPlayer(p2);
-        c.addPlayer(p3);
-        c.reviveCell(0, 0, p1.id);
-        c.reviveCell(0, 1, p2.id);
-        c.reviveCell(0, 2, p3.id);
-        c.evolve();
-        expect(c.getCell(1, 1).color).toEqual('#112233');
-      });
+    it(`A revived cell's color should be the average color of the live neighbours.`, () => {
+      const c = new ConwaysGame(3);
+      const p1 = { id: '1', color: '#334455' };
+      const p2 = { id: '2', color: '#aabbcc' };
+      const p3 = { id: '3', color: '#ccddee' };
+      c.addPlayer(p1);
+      c.addPlayer(p2);
+      c.addPlayer(p3);
+      c.reviveCell(0, 0, p1.id);
+      c.reviveCell(0, 1, p2.id);
+      c.reviveCell(0, 2, p3.id);
+      c.evolve();
+      expect(c.getCell(1, 1).color).toEqual('#8e9fb0');
     });
     describe('Class patterns', () => {
       it('Block Pattern', () => {
@@ -163,14 +161,6 @@ describe('ConwaysGame', () => {
       c.reviveCell(0, 0, p.id);
 
       expect(c.getCell(0, 0).live).toBeTruthy();
-    });
-  });
-  describe('averageColor', () => {
-    it('Should output average of colors', () => {
-      const c = new ConwaysGame(1);
-
-      expect(c.averageColor(['#111111', '#222222', '#333333'])).toBe('#222222');
-      expect(c.averageColor(['#aabbcc', '#cccccc', '#dddddd'])).toBe('#c6ccd2');
     });
   });
 });

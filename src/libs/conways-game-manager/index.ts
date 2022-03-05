@@ -1,5 +1,9 @@
 import { ConwaysGame, Player } from '../conways-game';
 
+type Subscribers = {
+  [playerId: string]: Function;
+};
+
 /**
  * ConwaysGameManager
  * Takes in cahrge of evolving the ConwaysGame and notify players when updated.
@@ -7,9 +11,7 @@ import { ConwaysGame, Player } from '../conways-game';
 export class ConwaysGameManager {
   private game: ConwaysGame;
   private evolver: NodeJS.Timer;
-  private observers: {
-    [playerId: string]: Function;
-  } = {};
+  private subscribers: Subscribers = {};
 
   constructor(g: ConwaysGame, duration: number) {
     this.game = g;
@@ -18,28 +20,33 @@ export class ConwaysGameManager {
     }, duration);
   }
 
+  private getSubscriberIds() {
+    return Object.keys(this.subscribers);
+  }
+
   getGame(): ConwaysGame {
     return this.game;
   }
 
   subscribe(player: Player, callback: Function) {
-    delete this.observers[player.id];
-    this.observers[player.id] = callback;
+    delete this.subscribers[player.id];
+    this.subscribers[player.id] = callback;
   }
 
   unsubscribe(playerId: string) {
-    delete this.observers[playerId];
+    delete this.subscribers[playerId];
   }
 
   private evolveConwaysGame() {
     const newBoard = this.game.evolve();
 
-    Object.keys(this.observers).forEach((playerId) => {
-      this.observers[playerId](newBoard);
+    Object.keys(this.subscribers).forEach((playerId) => {
+      this.subscribers[playerId](newBoard);
     });
   }
 
   destroy() {
+    this.getSubscriberIds().forEach((s) => this.unsubscribe(s));
     clearInterval(this.evolver);
   }
 }

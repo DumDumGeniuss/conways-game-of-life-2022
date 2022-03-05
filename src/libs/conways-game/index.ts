@@ -1,7 +1,3 @@
-type PlayerIdsMap = {
-  [id: string]: true;
-};
-
 /**
  * Cell
  * @property {boolean} live Whether it's live or not.
@@ -112,7 +108,7 @@ export class ConwaysGame {
     return x < 0 || x >= this.size || y < 0 || y >= this.size;
   }
 
-  averageColor(colors: string[]) {
+  private averageColor(colors: string[]) {
     const count = colors.length;
     let [r, g, b] = [0, 0, 0];
     colors.forEach((color) => {
@@ -279,7 +275,7 @@ export class ConwaysGame {
     }
   }
 
-  killCell(x: number, y: number) {
+  private killCell(x: number, y: number) {
     if (this.isOutsideBorder(x, y)) {
       return;
     }
