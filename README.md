@@ -2,7 +2,9 @@
 
 This is our server-side app of the Conways Game of Life.
 
-For client side, check [Conways Game of Life Client](https://github.com/DumDumGeniuss/conways-game-of-life-client-2022).
+It is being hosted on [https://cgof-server-2022.herokuapp.com/](https://cgof-server-2022.herokuapp.com/), but you can't see it by directly accessing it since it's an API server.
+
+For complete demo, please visit [https://conways-game-of-life-2022.vercel.app/](https://conways-game-of-life-2022.vercel.app/), and its source code [here](https://github.com/DumDumGeniuss/conways-game-of-life-client-2022).
 
 ## Game Rules
 
@@ -55,6 +57,62 @@ This handler is in charge of manaing an entire socket seesion, it does:
 2. Listening to events from client and update information in ConwaysGame instance.
 
 3. Trigger events to clients whenever the game board is updated of when a new user joined.
+
+## Challenging Issues
+
+### Latency
+
+The server is currently hosted on U.S (Heroku), so the latency is huge.
+
+Our current solution is:
+
+1. When players click a cell, we update the cell status on client side, and send a request to server.
+
+2. When server recives the request, it will do the corresponding action (revive, kill), and braodcast "cell_updated" events to all clients, so the chagnes are updated on other clients as well.
+
+3. Beside "2", the server will periodically emit "board_updated" event, to synchronize all clients with latest board, to avoid any inconsistency caused by lagging of intertnet.
+
+Pops:
+
+- Change is instant, you don't need to wait for next tick to see other players' actions.
+
+Cons:
+
+- Your actions can be fallbacked quite often when the latency is high.
+
+Proposed solution:
+
+1. Move server to somewhere near the target players.
+
+2. When latency is low enough, we can try not doing instant changes on client, instead we just wait for server to trigger "cell_updated" or "board_updated" event.
+
+### Race condition
+
+Race condition is a huge concern here, if it happenes, it could crash the logic of the game and perhaps also crash the app.
+
+Our current solution for rece condition is:
+
+1. Keep single game in an single node process, since node.js is running in single thread, so we can avoid race condition.
+
+2. Have a class that manages the entire game, so if unfortunately we encounter rece condition issue later on, we can delete this tricky work to this class, without us worrying about it.
+
+Props:
+
+- Can encapsulate all logic regarding a Conways game in a single Class.
+
+Cons:
+
+- In distributed system, we're gonna implement a mechanism that connets a player to the server hotsing the game they're joining.
+
+Proposed solution:
+
+1. Have an universal place for caching the game pogress (e.g: Reddis).
+
+2. Have a dedicated server separated from socket server, which only in charge of generating the Conways games' generations and save them in cache.
+
+3. When a player connects to the server, the server will get the game pogress in universal cache.
+
+4. When a player requests to perform an action to the server, the server will put the action in a queue, then our dedicated server will perform those actions before generating next generation.
 
 ## Deployment Guide
 
@@ -159,7 +217,7 @@ So we have to save it in database, and impelment mechanisms to be able to restor
 
 Our Conways game is currently managed by the ConwaysGame object, which means a gmae can only be hosted in one server.
 
-If we have multiple servers, we have to either direct players to the server where their game is hosted or put the game in a cahce that can be accessed by all servers.
+If we have multiple servers, we have to either direct players to the server where their game is hosted or put the game in a cache that can be accessed by all servers.
 
 ### Game Points
 
