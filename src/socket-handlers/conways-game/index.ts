@@ -4,7 +4,10 @@ import { ConwaysGameManager } from '../../libs/conways-game-manager';
 import { validateToken, generateToken, User } from '../../utils/authenticate/';
 import { generateHash, generateHexColor } from '../../utils/common/';
 
-const conwaysGameManager = new ConwaysGameManager(new ConwaysGame(30), 2000);
+const conwaysGameManager = new ConwaysGameManager(
+  new ConwaysGame(30),
+  parseInt(process.env.EVOLUTION_DURATION || '3000', 10)
+);
 
 enum SocketEventName {
   Logged = 'logged',
