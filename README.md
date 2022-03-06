@@ -20,11 +20,15 @@ For complete demo, please visit [https://conways-game-of-life-2022.vercel.app/](
 
 We have two classes **ConwaysGame** and **ConwaysGameManager** and one **conways-game** socket handler.
 
+And this is the diagram indicating how they interact with each other.
+
+![architecture](./Architecture.png)
+
 ### ConwaysGame Class
 
 Check this for [more details](./src/libs/conways-game/README.md).
 
-A class that takes manages a Conways Game ecosystem, it does the following things:
+A class that manages a Conways Game, it does the following things:
 
 1. Initialize a Conways game with given size. By default, all cells are dead cells.
 
@@ -32,31 +36,31 @@ A class that takes manages a Conways Game ecosystem, it does the following thing
 
 3. Generate next generation of cells.
 
-4. Allow us to interface the ecosystem, e.g: Revive a cell with color from a player.
+4. Allow us to interface the ecosystem, e.g: Revive a cell, kill a cell.
 
 ### ConwaysGameManager Class
 
 Check this for [more details](./src/libs/conways-game-manager/README.md).
 
-A class the consumes a ConwaysGame instance and manage do the following things:
+A class the consumes a ConwaysGame instance and do the following things:
 
-1. Provide ConwaysGame instace to a new player in a new socket session.
+1. Provide ConwaysGame instace to a new player upon a new socket connection.
 
-2. Periodically call **"evolve"** method of ConwaysGame instance, so our ConwaysGame don't have to do it by its own.
+2. Periodically call **"evolve()"** method of ConwaysGame instance, so we have an universal timer of the evoluation of a Conways game.
 
-3. Subscribe players to the evolution of a ConwaysGame instance, so our clients can receive the event at nearly same time (though latency of internet is inevitable), to better synchronize the game processes of all clients.
+3. Subscribe players to the evolution of a ConwaysGame instance, so all our clients can receive the event at nearly the same time (though latency of internet is inevitable), to better synchronize the game processes of all clients.
 
 ### Conways Game Socket Handlers
 
 Check this for [more details](./src/socket-handlers/conways-game/README.md).
 
-This handler is in charge of manaing an entire socket seesion, it does:
+This handler is in charge of managing an entire socket seesion of our clients, it does:
 
 1. Authenticate users.
 
-2. Listening to events from client and update information in ConwaysGame instance.
+2. Receive requested actions from client and call the corresponding methods of ConwaysGame instance, then braodcast the change to other clients when needed, e.g: "revive_cell", "kill_cell", "disconnect".
 
-3. Trigger events to clients whenever the game board is updated of when a new user joined.
+3. Trigger events to clients, so client can do the corresponding actions on their end, e.g: "game_started", "logged", "player_left", "cell_updated", "board_updated",
 
 ## Challenging Issues
 
@@ -213,7 +217,7 @@ Currenltly the game is saved in memory, which means when you restart the server,
 
 So we have to save it in database, and impelment mechanisms to be able to restore the game progress while people join the previous game.
 
-### Distrubuted Server
+### Distrubuted System
 
 Our Conways game is currently managed by the ConwaysGame object, which means a gmae can only be hosted in one server.
 
