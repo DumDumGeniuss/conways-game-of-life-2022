@@ -6,9 +6,11 @@ This is our server-side app of the Conways Game of Life.
 
 1. Basic Conways Game of Life rules applied, check this [wiki page](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).
 
-2. When a cell revived, the color will be the **"average color of all colors of live neigbours"**.
+2. When a cell revived, the color will be the **"average color of all colors of live neigbours"**, and those neigbours all become its parents.
 
-3. The only thing user can do is to **"revive dead cells"**.
+3. Players can revive dead cells and become their only parents.
+
+4. Players can kill the cells if you're parents or ancestors of the cell, you can't kill the cells that are not your descendents.
 
 ## Implementation
 

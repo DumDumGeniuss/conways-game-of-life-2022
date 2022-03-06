@@ -8,11 +8,15 @@ type Cell = {
   live: boolean;
   liveNbrsCount: number;
   color: string;
+  playerIds: {
+    [playerId: string]: true;
+  };
 };
 
 type CleanCell = {
   live: boolean;
   color: string;
+  playerIds: string[];
 };
 type Board = Cell[][];
 
@@ -98,6 +102,7 @@ export class ConwaysGame {
           live: false,
           liveNbrsCount: 0,
           color: '#000000',
+          playerIds: {},
         });
         this.liveNbrsCountMap.dead[0][`${i},${j}`] = [i, j];
       }
@@ -129,6 +134,7 @@ export class ConwaysGame {
     return {
       live: cell.live,
       color: cell.color,
+      playerIds: Object.keys(cell.playerIds),
     };
   }
 
@@ -168,7 +174,7 @@ export class ConwaysGame {
     }
 
     positionOfRevivingCells.forEach(([x, y]) => this.giveBirthToCell(x, y));
-    positionOfDyingCells.forEach(([x, y]) => this.killCell(x, y));
+    positionOfDyingCells.forEach(([x, y]) => this.giveDeathToCell(x, y));
 
     return this.getBoard();
   }
@@ -275,15 +281,47 @@ export class ConwaysGame {
     }
   }
 
-  private killCell(x: number, y: number) {
+  private getPlayerIdsOfCells(cells: Cell[]) {
+    const playerIds: string[] = [];
+    cells.forEach((cell) => {
+      Object.keys(cell.playerIds).forEach((id) => {
+        playerIds.push(id);
+      });
+    });
+    return playerIds;
+  }
+
+  private giveDeathToCell(x: number, y: number) {
+    if (this.isOutsideBorder(x, y)) {
+      return;
+    }
+    this.board[x][y].live = false;
+    this.board[x][y].color = '#000000';
+    this.board[x][y].playerIds = {};
+    this.updateLiveNbrsCountMap({
+      x,
+      y,
+      live: true,
+      newLive: false,
+      count: this.board[x][y].liveNbrsCount,
+      newCount: this.board[x][y].liveNbrsCount,
+    });
+    this.decreaseNbrsLiveNbrsCount(x, y);
+  }
+
+  killCell(x: number, y: number, playerId: string) {
     if (this.isOutsideBorder(x, y)) {
       return;
     }
     if (!this.board[x][y].live) {
       return;
     }
+    if (!this.board[x][y].playerIds[playerId]) {
+      return;
+    }
     this.board[x][y].live = false;
     this.board[x][y].color = '#000000';
+    this.board[x][y].playerIds = {};
     this.updateLiveNbrsCountMap({
       x,
       y,
@@ -303,6 +341,9 @@ export class ConwaysGame {
     const liveNbs = this.getLiveNbs(x, y);
     deadCell.live = true;
     deadCell.color = this.averageColor(liveNbs.map((liveNbr) => liveNbr.color));
+    this.getPlayerIdsOfCells(liveNbs).forEach((id) => {
+      deadCell.playerIds[id] = true;
+    });
     this.updateLiveNbrsCountMap({
       x,
       y,
@@ -326,6 +367,7 @@ export class ConwaysGame {
     }
     this.board[x][y].live = true;
     this.board[x][y].color = this.playersMap[playerId].color;
+    this.board[x][y].playerIds[playerId] = true;
     this.updateLiveNbrsCountMap({
       x,
       y,
@@ -335,7 +377,6 @@ export class ConwaysGame {
       newCount: this.board[x][y].liveNbrsCount,
     });
     this.addNbrsLiveNbrsCount(x, y);
-    return this.processCell(this.board[x][y]);
   }
 }
 

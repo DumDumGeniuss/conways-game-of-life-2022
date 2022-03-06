@@ -7,6 +7,7 @@ describe('ConwaysGame', () => {
       const expected = {
         live: false,
         color: '#000000',
+        playerIds: [],
       };
       expect(c.getCell(99, 99)).toEqual(expected);
     });
@@ -44,6 +45,20 @@ describe('ConwaysGame', () => {
       c.reviveCell(0, 2, p3.id);
       c.evolve();
       expect(c.getCell(1, 1).color).toEqual('#8e9fb0');
+    });
+    it(`A revived cell should know all parent ids.`, () => {
+      const c = new ConwaysGame(3);
+      const p1 = { id: '1', color: '#334455' };
+      const p2 = { id: '2', color: '#aabbcc' };
+      const p3 = { id: '3', color: '#ccddee' };
+      c.addPlayer(p1);
+      c.addPlayer(p2);
+      c.addPlayer(p3);
+      c.reviveCell(0, 0, p1.id);
+      c.reviveCell(0, 1, p2.id);
+      c.reviveCell(0, 2, p3.id);
+      c.evolve();
+      expect(c.getCell(1, 1).playerIds).toEqual(['1', '2', '3']);
     });
     describe('Class patterns', () => {
       it('Block Pattern', () => {
@@ -161,6 +176,26 @@ describe('ConwaysGame', () => {
       c.reviveCell(0, 0, p.id);
 
       expect(c.getCell(0, 0).live).toBeTruthy();
+    });
+  });
+  describe('killCell', () => {
+    it('Should not kill the cell if you are not one of the parents of the cell.', () => {
+      const c = new ConwaysGame(1);
+      const p = { id: '1234', color: '#112233' };
+      c.addPlayer(p);
+      c.reviveCell(0, 0, p.id);
+      c.killCell(0, 0, '4321');
+
+      expect(c.getCell(0, 0).live).toBe(true);
+    });
+    it('Should kill the cell', () => {
+      const c = new ConwaysGame(1);
+      const p = { id: '1234', color: '#112233' };
+      c.addPlayer(p);
+      c.reviveCell(0, 0, p.id);
+      c.killCell(0, 0, '1234');
+
+      expect(c.getCell(0, 0).live).toBeFalsy();
     });
   });
 });

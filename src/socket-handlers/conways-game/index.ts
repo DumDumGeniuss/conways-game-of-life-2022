@@ -11,9 +11,10 @@ enum SocketEventName {
   GameStarted = 'game_started',
   PlayerJoined = 'player_joined',
   PlayerLeft = 'player_left',
-  CellRevived = 'cell_revived',
   BoardUpdated = 'board_updated',
+  CellUpdated = 'cell_updated',
   ReviveCell = 'revive_cell',
+  KillCell = 'kill_cell',
   Disconnect = 'disconnect',
 }
 
@@ -66,13 +67,18 @@ const emitPlayerLeftEvent = (nop: Socket, playerId: string) => {
   nop.broadcast.emit(SocketEventName.PlayerLeft, playerId);
 };
 
-const emitCellRevivedEvent = (
+const emitCellUpatedEvent = (
   nop: Socket,
+  conwaysGame: ConwaysGame,
   x: number,
-  y: number,
-  playerId: string
+  y: number
 ) => {
-  nop.broadcast.emit(SocketEventName.CellRevived, x, y, playerId);
+  nop.broadcast.emit(
+    SocketEventName.CellUpdated,
+    x,
+    y,
+    conwaysGame.getCell(x, y)
+  );
 };
 
 const subscribePlayerForBoardUpdatedEvent = (
@@ -96,7 +102,19 @@ const handleReviveCellEvent = (
   nop.on(SocketEventName.ReviveCell, (x: number, y: number) => {
     conwaysGame.reviveCell(x, y, playerId);
 
-    emitCellRevivedEvent(nop, x, y, playerId);
+    emitCellUpatedEvent(nop, conwaysGame, x, y);
+  });
+};
+
+const handleKillCellEvent = (
+  nop: Socket,
+  conwaysGame: ConwaysGame,
+  playerId: string
+) => {
+  nop.on(SocketEventName.KillCell, (x: number, y: number) => {
+    conwaysGame.killCell(x, y, playerId);
+
+    emitCellUpatedEvent(nop, conwaysGame, x, y);
   });
 };
 
@@ -135,6 +153,7 @@ export const conwaysGameHandler = (nop: Socket) => {
 
   // Handle events from client
   handleReviveCellEvent(nop, conwaysGame, player.id);
+  handleKillCellEvent(nop, conwaysGame, player.id);
   handleDisconnectEvent(nop, conwaysGame, player.id);
 };
 
