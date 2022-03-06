@@ -16,6 +16,24 @@ For complete demo, please visit [https://conways-game-of-life-2022.vercel.app/](
 
 4. Players can kill the cells if you're parents or ancestors of the cell, you can't kill the cells that are not your descendents.
 
+## Todo List
+
+### Logging system
+
+We don't have a good logging system yet, will need to implement a mechanism to allow us to collect logs from servers and put them somewhere.
+
+### Save Game Progress
+
+Currenltly the game is saved in memory, which means when you restart the server, the game progress will lose.
+
+We have to save it in database, and impelment mechanisms to be able to restore the game progress while people continue the previous game.
+
+### Distrubuted System
+
+Our Conways game is currently managed by the ConwaysGame object, which means a gmae can only be hosted in one server.
+
+If we have multiple servers, we have to either direct players to the server where their game is hosted or put the game in a cache that can be accessed by all servers.
+
 ## Implementation
 
 We have two classes **ConwaysGame** and **ConwaysGameManager** and one **conways-game** socket handler.
@@ -204,25 +222,3 @@ Please make .husky/pre-commit executable
 ```bash
 chmod +x .husky/pre-commit
 ```
-
-## TODO LIST
-
-### Logging system
-
-We don't have a good logging system yet, will need to implement a mechanism to allow us to collect logs from servers and put them somewhere.
-
-### Save Game Progress
-
-Currenltly the game is saved in memory, which means when you restart the server, the game progress will lose.
-
-So we have to save it in database, and impelment mechanisms to be able to restore the game progress while people join the previous game.
-
-### Distrubuted System
-
-Our Conways game is currently managed by the ConwaysGame object, which means a gmae can only be hosted in one server.
-
-If we have multiple servers, we have to either direct players to the server where their game is hosted or put the game in a cache that can be accessed by all servers.
-
-### Game Points
-
-To make the game more interesting, I want to introduce points to the game, for instance, when your cell swallow other players' cells, you get points.
