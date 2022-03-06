@@ -2,6 +2,8 @@
 
 This is our server-side app of the Conways Game of Life.
 
+For client side, check [Conways Game of Life Client](https://github.com/DumDumGeniuss/conways-game-of-life-client-2022).
+
 ## Game Rules
 
 1. Basic Conways Game of Life rules applied, check this [wiki page](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).
